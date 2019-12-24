@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:math' as math;
 
 import 'FirstRightEdgeAlignScrollPhysics.dart';
 
@@ -33,21 +34,23 @@ class LeftAlignScrollPhysics extends FirstRightEdgeAlignScrollPhysics {
   // 上一个item可见宽度
   final double lastItemVisibleWidth;
 
-  LeftAlignScrollPhysics({this.lastItemVisibleWidth = 0, viewportFraction = 1.0, itemCount = 0, ScrollPhysics parent})
-      : super(viewportFraction: viewportFraction, itemCount: itemCount, parent: parent);
+  LeftAlignScrollPhysics({this.lastItemVisibleWidth = 0, viewportFraction = 1.0,
+    edge = 0.0, itemCount = 0, ScrollPhysics parent})
+      : super(viewportFraction: viewportFraction, edge: edge, itemCount: itemCount, parent: parent);
 
   @override
   LeftAlignScrollPhysics applyTo(ScrollPhysics ancestor) {
-    return LeftAlignScrollPhysics(lastItemVisibleWidth: lastItemVisibleWidth, viewportFraction: viewportFraction,
+    return LeftAlignScrollPhysics(lastItemVisibleWidth: lastItemVisibleWidth, edge: edge,
+        viewportFraction: viewportFraction,
         itemCount: itemCount, parent: buildParent(ancestor));
   }
 
   @override
   double getPixels(ScrollPosition position, double page, double portion) {
     if (page < 1) {
-      return portion;
+      return math.max(0, portion - edge);
     } else if (page == itemCount - 1) {
-      return (page * getItemWidth(position)) - portion;
+      return (page * getItemWidth(position)) - portion + edge;
     } else {
       return (page * getItemWidth(position)) + portion - lastItemVisibleWidth;
     }

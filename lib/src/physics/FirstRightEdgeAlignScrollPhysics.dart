@@ -10,15 +10,18 @@ import 'dart:math' as math;
 /// modification history:
 class FirstRightEdgeAlignScrollPhysics extends BouncingScrollPhysics {
   final double viewportFraction;
+  // banner左右边距
+  final double edge;
   final int itemCount;
 
-  FirstRightEdgeAlignScrollPhysics({this.viewportFraction = 1.0, this.itemCount = 0, ScrollPhysics parent})
+  FirstRightEdgeAlignScrollPhysics({this.viewportFraction = 1.0,
+    this.edge = 0.0, this.itemCount = 0, ScrollPhysics parent})
       : super(parent: parent);
 
   @override
   FirstRightEdgeAlignScrollPhysics applyTo(ScrollPhysics ancestor) {
     return FirstRightEdgeAlignScrollPhysics(viewportFraction: viewportFraction,
-        itemCount: itemCount, parent: buildParent(ancestor));
+        edge: edge, itemCount: itemCount, parent: buildParent(ancestor));
   }
 
   double getPage(ScrollPosition position, double portion) {
@@ -28,9 +31,9 @@ class FirstRightEdgeAlignScrollPhysics extends BouncingScrollPhysics {
 
   double getPixels(ScrollPosition position, double page, double portion) {
     if(page < 1) {
-      return portion;
+      return math.max(0, portion - edge);
     } else if(page == itemCount - 1) {
-      return (page * getItemWidth(position)) - portion;
+      return (page * getItemWidth(position)) - portion + edge;
     } else {
       return (page * getItemWidth(position));
     }
@@ -51,7 +54,7 @@ class FirstRightEdgeAlignScrollPhysics extends BouncingScrollPhysics {
       page += 0.5;
     }
     double target = getPixels(position, page.roundToDouble(), portion);
-    target = math.min(math.max(portion, target), position.maxScrollExtent - portion);
+    target = math.min(math.max(portion - edge, target), position.maxScrollExtent - portion + edge);
     return target;
   }
 
@@ -87,11 +90,12 @@ class FirstRightEdgeAlignScrollPhysics extends BouncingScrollPhysics {
     final double itemWidth = getItemWidth(position);
     final portion = (position.viewportDimension - itemWidth) / 2;
 
-    if (position.pixels > position.minScrollExtent + portion && position.pixels < position.maxScrollExtent - portion)
+    if (position.pixels > position.minScrollExtent + portion - edge &&
+        position.pixels < position.maxScrollExtent - portion + edge)
       return offset;
 
-    final double overscrollPastStart = math.max(position.minScrollExtent - position.pixels + portion, 0.0);
-    final double overscrollPastEnd = math.max(position.pixels - position.maxScrollExtent - portion, 0.0);
+    final double overscrollPastStart = math.max(position.minScrollExtent - position.pixels + portion - edge, 0.0);
+    final double overscrollPastEnd = math.max(position.pixels - position.maxScrollExtent - portion + edge, 0.0);
     final double overscrollPast = math.max(overscrollPastStart, overscrollPastEnd);
     final bool easing = (overscrollPastStart > 0.0 && offset < 0.0)
         || (overscrollPastEnd > 0.0 && offset > 0.0);
