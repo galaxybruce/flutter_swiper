@@ -108,6 +108,10 @@ class Swiper extends StatefulWidget {
   // This value is valid when viewportFraction is set and < 1.0
   final double fade;
 
+  // Set to false to disable page snapping, useful for custom scroll behavior.
+  // Same as [PageView.pageSnapping]
+  final bool pageSnapping;
+
   final PageIndicatorLayout indicatorLayout;
 
   Swiper({
@@ -145,6 +149,9 @@ class Swiper extends StatefulWidget {
     this.outer: false,
     this.scale,
     this.fade,
+
+    /// add by bruce.zhang
+    this.pageSnapping = true,
   })  : assert(itemBuilder != null || transformer != null,
             "itemBuilder and transformItemBuilder must not be both null"),
         assert(
@@ -490,6 +497,7 @@ class _SwiperState extends _SwiperTimerMixin {
       }
 
       Widget child = new TransformerPageView(
+        pageSnapping: widget.pageSnapping,
         pageController: _pageController,
         loop: widget.loop,
         itemCount: widget.itemCount,
