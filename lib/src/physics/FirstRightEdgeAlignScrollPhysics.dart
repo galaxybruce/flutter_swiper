@@ -22,7 +22,8 @@ class FirstRightEdgeAlignScrollPhysics extends BouncingScrollPhysics {
   }
 
   double getPage(ScrollPosition position, double portion) {
-    return (position.pixels + portion) / getItemWidth(position);
+    // 这里的position.pixels不能增加portion或者减小portion，不然翻页边界会受到影响
+    return (position.pixels) / getItemWidth(position);
   }
 
   double getPixels(ScrollPosition position, double page, double portion) {
