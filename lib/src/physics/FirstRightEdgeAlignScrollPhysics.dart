@@ -13,6 +13,7 @@ class FirstRightEdgeAlignScrollPhysics extends BouncingScrollPhysics {
   // banner左右边距
   final double edge;
   final int itemCount;
+  double maxScrollExtent = 0.0;
 
   FirstRightEdgeAlignScrollPhysics({this.viewportFraction = 1.0,
     this.edge = 0.0, this.itemCount = 0, ScrollPhysics parent})
@@ -54,7 +55,9 @@ class FirstRightEdgeAlignScrollPhysics extends BouncingScrollPhysics {
       page += 0.5;
     }
     double target = getPixels(position, page.roundToDouble(), portion);
-    target = math.min(math.max(portion - edge, target), position.maxScrollExtent - portion + edge);
+    // target = math.min(math.max(portion - edge, target), position.maxScrollExtent - portion + edge);
+    maxScrollExtent = math.max(maxScrollExtent, position.maxScrollExtent);
+    target = math.min(math.max(portion - edge, target), maxScrollExtent - portion + edge);
     return target;
   }
 
